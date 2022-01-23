@@ -24,7 +24,7 @@ export const getCategoriesRequest = createAsyncThunk(
     }
 
     try {
-      const response = await fetch("http://localhost:7070/api/categories", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`, {
         method: "GET"
       });
 
@@ -55,7 +55,7 @@ export const getProductsRequest = createAsyncThunk(
     }
 
     try {
-      const response = await fetch(`http://localhost:7070/api/items?categoryId=${categoryId}&offset=${offset}&q=${searchString}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/items?categoryId=${categoryId}&offset=${offset}&q=${searchString}`, {
         method: "GET",
       });
 

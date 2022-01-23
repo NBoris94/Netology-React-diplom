@@ -18,7 +18,7 @@ export const getTopSalesRequest = createAsyncThunk(
     }
 
     try {
-      const response = await fetch("http://localhost:7070/api/top-sales", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/top-sales`, {
         method: "GET"
       });
 

@@ -32,7 +32,7 @@ export const getProductByIdRequest = createAsyncThunk(
     }
 
     try {
-      const response = await fetch(`http://localhost:7070/api/items/${productId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/items/${productId}`, {
         method: "GET"
       });
 
