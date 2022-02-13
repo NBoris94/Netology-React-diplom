@@ -1,8 +1,10 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from 'uuid';
+import {load} from "../../libs/localStorage";
+import {fetchOrder} from "../../libs/api";
 
 const initialState = {
-  items: [],
+  items: load("cart") || [],
   success: false,
   loading: 'idle',
   error: null,
@@ -19,22 +21,7 @@ export const createOrderRequest = createAsyncThunk(
       return;
     }
 
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/order`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(order),
-      });
-
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-    }
-    catch (e) {
-      return rejectWithValue(e.message);
-    }
+    return await fetchOrder(order, rejectWithValue);
   }
 );
 
@@ -42,20 +29,9 @@ const cartSlice = createSlice({
   name: 'cartSlice',
   initialState,
   reducers: {
-    //Получение всех позиций корзины из Локального хранилища
-    getCartItemsFromLocalStorage(state, action) {
-      state.items = JSON.parse(localStorage.getItem("cart")) || [];
-    },
-
-    // Запись всех позиций корзины в Локальное хранилище
-    setCartItemsToLocalStorage(state, action) {
-      localStorage.setItem("cart", JSON.stringify(state.items));
-    },
-
     // Установка данных клиента в cookie
     setCustomerInfo(state, action) {
       const { name, value } = action.payload;
-      console.log(name, value);
       document.cookie = `${name}=${value};samesite=strict;`;
     },
 

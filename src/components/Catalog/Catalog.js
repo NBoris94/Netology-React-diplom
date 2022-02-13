@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import PropTypes from "prop-types";
+import {createSearchParams, useNavigate, useSearchParams} from "react-router-dom";
 import Categories from "./Categories";
 import Search from "./Search";
 import Preloader from "../Preloader";
@@ -16,6 +17,8 @@ import {
 
 function Catalog({ withSearch }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {
     products,
     categories,
@@ -28,10 +31,14 @@ function Catalog({ withSearch }) {
   } = useSelector((store) => store.catalogSlice);
 
   useEffect(() => {
+    const params = Object.fromEntries([...searchParams])
+    const categoryId = params.categoryId === undefined ? 0 : Number(params.categoryId);
+    const searchString = params.search === undefined ? '' : params.search;
+
     // Сначала подгружем все категории, а потом товары
     dispatch(getCategoriesRequest()).then(({ type }) => {
       if (type === 'categories/getAll/fulfilled') {
-        dispatch(getProductsRequest({categoryId: 0, offset: 0, searchString}));
+        dispatch(getProductsRequest({categoryId, offset: 0, searchString}));
       }
     });
   }, [dispatch]);
@@ -40,7 +47,19 @@ function Catalog({ withSearch }) {
   const changeFieldValueHandler = (e) => {
     if (e.target.value === '') {
       dispatch(clearProducts());
-      dispatch(getProductsRequest({categoryId: selectedCategoryId, offset, searchString: ''}));
+      dispatch(getProductsRequest({categoryId: selectedCategoryId, offset, searchString: ''}))
+        .then(() => {
+          const params = {};
+
+          if(selectedCategoryId !== 0) {
+            params.categoryId = selectedCategoryId;
+          }
+
+          navigate({
+            pathname: '/catalog',
+            search: `?${createSearchParams(params)}`
+          })
+        });
     }
     dispatch(changeSearchStringValue(e.target.value))
   }
@@ -48,8 +67,22 @@ function Catalog({ withSearch }) {
   // Получение товаров через поиск
   const onSubmitSearchHandler = (e) => {
     e.preventDefault();
-    dispatch(clearProducts());
-    dispatch(getProductsRequest({categoryId: selectedCategoryId, offset: 0, searchString}));
+    if (searchString !== '') {
+      dispatch(clearProducts());
+      dispatch(getProductsRequest({categoryId: selectedCategoryId, offset: 0, searchString}))
+        .then(() => {
+          const params = { search: searchString };
+
+          if(selectedCategoryId !== 0) {
+            params.categoryId = selectedCategoryId;
+          }
+
+          navigate({
+            pathname: '/catalog',
+            search: `?${createSearchParams(params)}`
+          })
+        });
+    }
   }
 
   // Получение товаров при смене категории
@@ -57,7 +90,25 @@ function Catalog({ withSearch }) {
     e.preventDefault();
 
     dispatch(clearProducts());
-    dispatch(getProductsRequest({categoryId, offset, searchString}));
+    dispatch(getProductsRequest({categoryId, offset, searchString}))
+      .then(() => {
+        if (withSearch) {
+          const params = {};
+
+          if (categoryId !== 0) {
+            params.categoryId = categoryId;
+          }
+
+          if(searchString !== '') {
+            params.search = searchString;
+          }
+
+          navigate({
+            pathname: '/catalog',
+            search: `?${createSearchParams(params)}`
+          })
+        }
+      });
   }
 
   // Получение товаров при клике на "Загрузить еще"

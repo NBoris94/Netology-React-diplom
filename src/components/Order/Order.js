@@ -6,7 +6,6 @@ import Error from "../Error";
 import {
   clearCartItems,
   createOrderRequest,
-  setCartItemsToLocalStorage,
   setCustomerInfo,
   setOnSuccess
 } from "../../store/slices/cartSlice";
@@ -90,7 +89,6 @@ function Order() {
       dispatch(createOrderRequest(order)).then(() => {
         dispatch(setOnSuccess(true));
         dispatch(clearCartItems());
-        dispatch(setCartItemsToLocalStorage());
         dispatch(setCustomerInfo({name: 'phone', value: order.owner.phone}));
         dispatch(setCustomerInfo({name: 'address', value: order.owner.address}));
 

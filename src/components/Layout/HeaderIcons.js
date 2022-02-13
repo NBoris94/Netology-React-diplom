@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch} from "react-redux";
-import {useNavigate} from "react-router-dom";
+import {createSearchParams, useNavigate} from "react-router-dom";
 import {changeSearchStringValue, getProductsRequest} from "../../store/slices/catalogSlice";
 import CartIcon from "../Cart/CartIcon";
 import GlobalSearch from "./GlobalSearch";
@@ -47,7 +47,10 @@ function HeaderIcons() {
       setSearch('');
       searchInputRef.current.blur();
       setInvisibleSearchForm(true);
-      navigate("/catalog");
+      navigate({
+        pathname: '/catalog',
+        search: `?${createSearchParams({ search })}`
+      })
     });
   }
 

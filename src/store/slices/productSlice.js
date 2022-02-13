@@ -1,4 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {fetchProduct} from "../../libs/api";
 
 const initialState = {
   product: {
@@ -31,20 +32,7 @@ export const getProductByIdRequest = createAsyncThunk(
       return;
     }
 
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/items/${productId}`, {
-        method: "GET"
-      });
-
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-
-      return await response.json();
-    }
-    catch (e) {
-      return rejectWithValue(e.message);
-    }
+    return await fetchProduct(productId, rejectWithValue);
   }
 );
 

@@ -1,4 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {fetchCategories, fetchProducts} from "../../libs/api";
 
 const initialState = {
   products: [],
@@ -23,20 +24,7 @@ export const getCategoriesRequest = createAsyncThunk(
       return;
     }
 
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/categories`, {
-        method: "GET"
-      });
-
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-
-      return await response.json();
-    }
-    catch (e) {
-      return rejectWithValue(e.message);
-    }
+    return await fetchCategories(rejectWithValue);
   }
 );
 
@@ -54,22 +42,7 @@ export const getProductsRequest = createAsyncThunk(
       return;
     }
 
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/items?categoryId=${categoryId}&offset=${offset}&q=${searchString}`, {
-        method: "GET",
-      });
-
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-
-      const data = await response.json();
-
-      return { data, categoryId, offset };
-    }
-    catch (e) {
-      return rejectWithValue(e.message);
-    }
+    return await fetchProducts(categoryId, offset, searchString, rejectWithValue);
   }
 );
 
@@ -151,6 +124,7 @@ const catalogSlice = createSlice({
           }
 
           state.selectedCategoryId = action.payload.categoryId;
+          state.searchString = action.payload.searchString;
           state.offset = action.payload.offset;
           state.loading = 'idle';
           state.currentProductsRequestId = undefined;

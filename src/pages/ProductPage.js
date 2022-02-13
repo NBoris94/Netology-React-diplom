@@ -5,7 +5,7 @@ import ProductInfo from "../components/Product/ProductInfo";
 import Preloader from "../components/Preloader";
 import Error from "../components/Error";
 import {getProductByIdRequest} from "../store/slices/productSlice";
-import {addItemToCart, setCartItemsToLocalStorage} from "../store/slices/cartSlice";
+import {addItemToCart} from "../store/slices/cartSlice";
 
 function ProductPage() {
   const dispatch = useDispatch();
@@ -46,7 +46,6 @@ function ProductPage() {
     };
 
     dispatch(addItemToCart(cartItem));
-    dispatch(setCartItemsToLocalStorage());
     navigate("/cart");
   }
 

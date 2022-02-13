@@ -4,6 +4,10 @@ const Koa = require("koa");
 const Router = require("koa-router");
 const cors = require("koa2-cors");
 const koaBody = require("koa-body");
+const serve = require("koa-static");
+const mount = require("koa-mount");
+const BodyParser = require("koa-bodyparser");
+const Logger = require("koa-logger");
 
 const categories = JSON.parse(fs.readFileSync("./data/categories.json"));
 const items = JSON.parse(fs.readFileSync("./data/products.json"));
@@ -42,12 +46,25 @@ const fortune = (ctx, body = null, status = 200) => {
 };
 
 const app = new Koa();
+
+const static_pages = new Koa();
+static_pages.use(serve(__dirname + "/build")); //serve the build directory
+app.use(mount("/", static_pages));
+
+const port = process.env.PORT || 3000;
+
+app.use(BodyParser());
+app.use(Logger());
 app.use(cors());
 app.use(
   koaBody({
     json: true,
   })
 );
+
+app.listen(port);
+// const server = http.createServer(app.callback());
+// server.listen(port);
 
 const router = new Router();
 
@@ -121,7 +138,3 @@ router.post("/api/order", async (ctx, next) => {
 
 app.use(router.routes());
 app.use(router.allowedMethods());
-
-const port = process.env.PORT || 7070;
-const server = http.createServer(app.callback());
-server.listen(port);

@@ -1,4 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {fetchTopSales} from "../../libs/api";
 
 const initialState = {
   products: [],
@@ -17,20 +18,7 @@ export const getTopSalesRequest = createAsyncThunk(
       return;
     }
 
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/top-sales`, {
-        method: "GET"
-      });
-
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-
-      return await response.json();
-    }
-    catch (e) {
-      return rejectWithValue(e.message);
-    }
+    return await fetchTopSales(rejectWithValue);
   }
 );
 
